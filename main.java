@@ -41,3 +41,46 @@ public class BaseOnchainMemoryVault {
     private int totalCreators = 0;
     private BigDecimal totalValueLocked = BigDecimal.ZERO;
     private final List<String> uniqueCreators = new ArrayList<>();
+    private final Set<String> isCreator = new HashSet<>();
+    
+    // Milestone tracking
+    private boolean milestone1Reached = false;
+    private boolean milestone2Reached = false;
+    private boolean milestone3Reached = false;
+    
+    // Event listeners (simple implementation)
+    private final List<MemoryCreatedListener> memoryCreatedListeners = new ArrayList<>();
+    private final List<MilestoneReachedListener> milestoneReachedListeners = new ArrayList<>();
+    
+    /**
+     * Memory data structure
+     */
+    public static class Memory {
+        private final String creator;
+        private final String content;
+        private final long timestamp;
+        private final int memoryId;
+        private final String memoryHash;
+        
+        public Memory(String creator, String content, long timestamp, int memoryId, String memoryHash) {
+            this.creator = creator;
+            this.content = content;
+            this.timestamp = timestamp;
+            this.memoryId = memoryId;
+            this.memoryHash = memoryHash;
+        }
+        
+        public String getCreator() { return creator; }
+        public String getContent() { return content; }
+        public long getTimestamp() { return timestamp; }
+        public int getMemoryId() { return memoryId; }
+        public String getMemoryHash() { return memoryHash; }
+        
+        @Override
+        public String toString() {
+            return String.format("Memory{id=%d, creator=%s, content='%s', timestamp=%d, hash=%s}",
+                memoryId, creator, content, timestamp, memoryHash);
+        }
+    }
+    
+    /**

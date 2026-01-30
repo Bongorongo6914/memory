@@ -170,3 +170,46 @@ public class BaseOnchainMemoryVault {
         return newMemory;
     }
     
+    /**
+     * Get a specific memory by ID
+     * @param memoryId The memory ID to retrieve
+     * @return The memory object
+     */
+    public Memory getMemory(int memoryId) {
+        if (memoryId < 0 || memoryId >= memories.size()) {
+            throw new IllegalArgumentException("Memory does not exist");
+        }
+        return memories.get(memoryId);
+    }
+    
+    /**
+     * Get all memories created by an address
+     * @param creator The creator address
+     * @return List of memory IDs
+     */
+    public List<Integer> getCreatorMemories(String creator) {
+        return new ArrayList<>(creatorMemories.getOrDefault(creator, new ArrayList<>()));
+    }
+    
+    /**
+     * Get total number of memories
+     * @return Total memories count
+     */
+    public int getTotalMemories() {
+        return totalMemories;
+    }
+    
+    /**
+     * Vault statistics
+     */
+    public static class VaultStats {
+        public final int totalMemories;
+        public final int totalCreators;
+        public final BigDecimal totalValueLocked;
+        public final int capacityRemaining;
+        public final boolean milestone1;
+        public final boolean milestone2;
+        public final boolean milestone3;
+        
+        public VaultStats(int totalMemories, int totalCreators, BigDecimal totalValueLocked,
+                         int capacityRemaining, boolean milestone1, boolean milestone2, boolean milestone3) {

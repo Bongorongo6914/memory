@@ -299,3 +299,46 @@ public class BaseOnchainMemoryVault {
      * @param hash The memory hash to search for
      * @return Optional containing memory ID if found
      */
+    public Optional<Integer> getMemoryByHash(String hash) {
+        for (int i = 0; i < memories.size(); i++) {
+            if (memories.get(i).getMemoryHash().equals(hash)) {
+                return Optional.of(i);
+            }
+        }
+        return Optional.empty();
+    }
+    
+    /**
+     * Verify a memory's integrity
+     * @param memoryId The memory ID to verify
+     * @return True if memory is valid
+     */
+    public boolean verifyMemory(int memoryId) {
+        if (memoryId < 0 || memoryId >= memories.size()) {
+            throw new IllegalArgumentException("Memory does not exist");
+        }
+        Memory mem = memories.get(memoryId);
+        String computedHash = keccak256(mem.getContent() + mem.getTimestamp() + mem.getCreator());
+        return computedHash.equals(mem.getMemoryHash());
+    }
+    
+    /**
+     * Add funds to vault
+     * @param amount Amount in wei
+     */
+    public void addFunds(BigDecimal amount) {
+        totalValueLocked = totalValueLocked.add(amount);
+    }
+    
+    /**
+     * Add event listener for memory creation
+     * @param listener The listener to add
+     */
+    public void addMemoryCreatedListener(MemoryCreatedListener listener) {
+        memoryCreatedListeners.add(listener);
+    }
+    
+    /**
+     * Add event listener for milestone reached
+     * @param listener The listener to add
+     */

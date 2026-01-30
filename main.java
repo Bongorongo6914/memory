@@ -385,3 +385,46 @@ public class BaseOnchainMemoryVault {
     
     /**
      * Main method for testing
+     */
+    public static void main(String[] args) {
+        // Initialize vault with 0.01 ether
+        BigDecimal initialFunding = new BigDecimal("10000000000000000"); // 0.01 ether
+        BaseOnchainMemoryVault vault = new BaseOnchainMemoryVault(initialFunding);
+        
+        // Add event listeners
+        vault.addMemoryCreatedListener((creator, memoryId, content, timestamp, hash) -> {
+            System.out.println("Memory created: ID=" + memoryId + ", Creator=" + creator);
+        });
+        
+        vault.addMilestoneReachedListener((milestone, timestamp) -> {
+            System.out.println("Milestone reached: " + milestone + " memories!");
+        });
+        
+        // Create some test memories
+        try {
+            String creator1 = "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb";
+            String creator2 = "0x8ba1f109551bD432803012645Hac136c22C9C00";
+            
+            vault.createMemory(creator1, "This is my first onchain memory!", 
+                new BigDecimal("1000000000000000")); // 0.001 ether
+            
+            vault.createMemory(creator2, "Base is the future! Everything onchain!", 
+                new BigDecimal("1000000000000000"));
+            
+            vault.createMemory(creator1, "Permanent storage on Base blockchain!", 
+                new BigDecimal("1000000000000000"));
+            
+            // Display stats
+            System.out.println("\nVault Statistics:");
+            System.out.println(vault.getVaultStats());
+            
+            // Get recent memories
+            System.out.println("\nRecent Memories:");
+            vault.getRecentMemories(3).forEach(System.out::println);
+            
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+}

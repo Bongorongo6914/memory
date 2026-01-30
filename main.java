@@ -213,3 +213,46 @@ public class BaseOnchainMemoryVault {
         
         public VaultStats(int totalMemories, int totalCreators, BigDecimal totalValueLocked,
                          int capacityRemaining, boolean milestone1, boolean milestone2, boolean milestone3) {
+            this.totalMemories = totalMemories;
+            this.totalCreators = totalCreators;
+            this.totalValueLocked = totalValueLocked;
+            this.capacityRemaining = capacityRemaining;
+            this.milestone1 = milestone1;
+            this.milestone2 = milestone2;
+            this.milestone3 = milestone3;
+        }
+        
+        @Override
+        public String toString() {
+            return String.format("VaultStats{memories=%d, creators=%d, valueLocked=%s, remaining=%d, m1=%s, m2=%s, m3=%s}",
+                totalMemories, totalCreators, totalValueLocked, capacityRemaining, milestone1, milestone2, milestone3);
+        }
+    }
+    
+    /**
+     * Get vault statistics
+     * @return Vault statistics object
+     */
+    public VaultStats getVaultStats() {
+        return new VaultStats(
+            totalMemories,
+            totalCreators,
+            totalValueLocked,
+            VAULT_CAPACITY - totalMemories,
+            milestone1Reached,
+            milestone2Reached,
+            milestone3Reached
+        );
+    }
+    
+    /**
+     * Get all unique creators
+     * @return List of creator addresses
+     */
+    public List<String> getAllCreators() {
+        return new ArrayList<>(uniqueCreators);
+    }
+    
+    /**
+     * Get recent memories (last N memories)
+     * @param count Number of recent memories to retrieve

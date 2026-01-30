@@ -342,3 +342,46 @@ public class BaseOnchainMemoryVault {
      * Add event listener for milestone reached
      * @param listener The listener to add
      */
+    public void addMilestoneReachedListener(MilestoneReachedListener listener) {
+        milestoneReachedListeners.add(listener);
+    }
+    
+    /**
+     * Keccak256 hash function (simplified - using SHA-256 as approximation)
+     * Note: For production, use a proper Keccak256 library
+     * @param input Input string to hash
+     * @return Hex string of hash
+     */
+    private String keccak256(String input) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(input.getBytes(StandardCharsets.UTF_8));
+            return bytesToHex(hash);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("SHA-256 algorithm not available", e);
+        }
+    }
+    
+    /**
+     * Convert bytes to hex string
+     * @param bytes Byte array
+     * @return Hex string
+     */
+    private String bytesToHex(byte[] bytes) {
+        StringBuilder result = new StringBuilder();
+        for (byte b : bytes) {
+            result.append(String.format("%02x", b));
+        }
+        return result.toString();
+    }
+    
+    /**
+     * Get all memories (for debugging/testing)
+     * @return Unmodifiable list of all memories
+     */
+    public List<Memory> getAllMemories() {
+        return Collections.unmodifiableList(memories);
+    }
+    
+    /**
+     * Main method for testing

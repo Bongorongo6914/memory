@@ -256,3 +256,46 @@ public class BaseOnchainMemoryVault {
     /**
      * Get recent memories (last N memories)
      * @param count Number of recent memories to retrieve
+     * @return List of recent memories
+     */
+    public List<Memory> getRecentMemories(int count) {
+        if (count <= 0) {
+            throw new IllegalArgumentException("Count must be greater than 0");
+        }
+        int start = totalMemories > count ? totalMemories - count : 0;
+        int end = totalMemories;
+        return new ArrayList<>(memories.subList(start, end));
+    }
+    
+    /**
+     * Internal function to check and trigger milestones
+     */
+    private void checkMilestones() {
+        if (!milestone1Reached && totalMemories >= MILESTONE_1) {
+            milestone1Reached = true;
+            long timestamp = Instant.now().getEpochSecond();
+            for (MilestoneReachedListener listener : milestoneReachedListeners) {
+                listener.onMilestoneReached(MILESTONE_1, timestamp);
+            }
+        }
+        if (!milestone2Reached && totalMemories >= MILESTONE_2) {
+            milestone2Reached = true;
+            long timestamp = Instant.now().getEpochSecond();
+            for (MilestoneReachedListener listener : milestoneReachedListeners) {
+                listener.onMilestoneReached(MILESTONE_2, timestamp);
+            }
+        }
+        if (!milestone3Reached && totalMemories >= MILESTONE_3) {
+            milestone3Reached = true;
+            long timestamp = Instant.now().getEpochSecond();
+            for (MilestoneReachedListener listener : milestoneReachedListeners) {
+                listener.onMilestoneReached(MILESTONE_3, timestamp);
+            }
+        }
+    }
+    
+    /**
+     * Get memory by hash (for verification)
+     * @param hash The memory hash to search for
+     * @return Optional containing memory ID if found
+     */

@@ -84,3 +84,46 @@ public class BaseOnchainMemoryVault {
     }
     
     /**
+     * Event listener interfaces
+     */
+    public interface MemoryCreatedListener {
+        void onMemoryCreated(String creator, int memoryId, String content, long timestamp, String memoryHash);
+    }
+    
+    public interface MilestoneReachedListener {
+        void onMilestoneReached(int milestone, long timestamp);
+    }
+    
+    /**
+     * Constructor - no parameters needed, everything pre-populated
+     * @param initialFunding Minimum 0.01 ether required
+     */
+    public BaseOnchainMemoryVault(BigDecimal initialFunding) {
+        BigDecimal minimumFunding = new BigDecimal("10000000000000000"); // 0.01 ether in wei
+        if (initialFunding.compareTo(minimumFunding) < 0) {
+            throw new IllegalArgumentException("Initial funding required (minimum 0.01 ether)");
+        }
+        totalValueLocked = initialFunding;
+        System.out.println("Vault initialized: " + VAULT_NAME);
+        System.out.println("Genesis timestamp: " + GENESIS_TIMESTAMP);
+        System.out.println("Vault seed: " + VAULT_SEED);
+    }
+    
+    /**
+     * Create a new onchain memory
+     * @param creator The creator's address
+     * @param content The memory content (max 280 characters)
+     * @param payment Payment amount in wei
+     * @return The created memory
+     */
+    public Memory createMemory(String creator, String content, BigDecimal payment) {
+        // Validation
+        if (content == null || content.isEmpty()) {
+            throw new IllegalArgumentException("Content cannot be empty");
+        }
+        if (content.length() > MAX_MEMORY_LENGTH) {
+            throw new IllegalArgumentException("Content too long (max " + MAX_MEMORY_LENGTH + " characters)");
+        }
+        if (payment.compareTo(MEMORY_COST_WEI) < 0) {
+            throw new IllegalArgumentException("Insufficient payment (minimum " + MEMORY_COST_WEI + " wei)");
+        }

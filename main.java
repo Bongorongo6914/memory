@@ -127,3 +127,46 @@ public class BaseOnchainMemoryVault {
         if (payment.compareTo(MEMORY_COST_WEI) < 0) {
             throw new IllegalArgumentException("Insufficient payment (minimum " + MEMORY_COST_WEI + " wei)");
         }
+        if (totalMemories >= VAULT_CAPACITY) {
+            throw new IllegalStateException("Vault at capacity");
+        }
+        
+        // Generate hash
+        long currentTimestamp = Instant.now().getEpochSecond();
+        String contentHash = keccak256(content + currentTimestamp + creator);
+        
+        if (memoryExists.contains(contentHash)) {
+            throw new IllegalArgumentException("Duplicate memory detected");
+        }
+        
+        // Create memory
+        int memoryId = totalMemories;
+        Memory newMemory = new Memory(creator, content, currentTimestamp, memoryId, contentHash);
+        
+        // Store memory
+        memories.add(newMemory);
+        creatorMemories.computeIfAbsent(creator, k -> new ArrayList<>()).add(memoryId);
+        memoryExists.add(contentHash);
+        
+        // Update creator stats
+        if (!isCreator.contains(creator)) {
+            isCreator.add(creator);
+            uniqueCreators.add(creator);
+            totalCreators++;
+        }
+        
+        creatorMemoryCount.put(creator, creatorMemoryCount.getOrDefault(creator, 0) + 1);
+        totalMemories++;
+        totalValueLocked = totalValueLocked.add(payment);
+        
+        // Check milestones
+        checkMilestones();
+        
+        // Emit event
+        for (MemoryCreatedListener listener : memoryCreatedListeners) {
+            listener.onMemoryCreated(creator, memoryId, content, currentTimestamp, contentHash);
+        }
+        
+        return newMemory;
+    }
+    
